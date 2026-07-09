@@ -1,13 +1,16 @@
-from flask import Blueprint
-from flask import redirect
-from flask import url_for
-from flask import render_template
-from flask import flash
+from flask import (
+    Blueprint,
+    redirect,
+    url_for,
+    render_template,
+    flash,
+)
 
 from flask_login import (
     login_user,
     logout_user,
     login_required,
+    current_user,
 )
 
 from app.forms.auth_forms import (
@@ -16,6 +19,7 @@ from app.forms.auth_forms import (
 )
 
 from app.services.auth_service import AuthService
+from app.services.audit_service import AuditService
 
 auth_bp = Blueprint(
     "auth",
@@ -23,6 +27,9 @@ auth_bp = Blueprint(
 )
 
 
+# -----------------------------------------
+# Home
+# -----------------------------------------
 @auth_bp.route("/")
 def home():
 
@@ -31,6 +38,9 @@ def home():
     )
 
 
+# -----------------------------------------
+# Login
+# -----------------------------------------
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -47,6 +57,17 @@ def login():
 
             login_user(user)
 
+            # Audit Log
+            AuditService.log(
+                user_id=user.id,
+                action="Login",
+            )
+
+            flash(
+                "Login Successful",
+                "success",
+            )
+
             return redirect(
                 url_for("dashboard.dashboard")
             )
@@ -62,6 +83,9 @@ def login():
     )
 
 
+# -----------------------------------------
+# Register
+# -----------------------------------------
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
 
@@ -97,11 +121,25 @@ def register():
     )
 
 
+# -----------------------------------------
+# Logout
+# -----------------------------------------
 @auth_bp.route("/logout")
 @login_required
 def logout():
 
+    # Audit Log
+    AuditService.log(
+        user_id=current_user.id,
+        action="Logout",
+    )
+
     logout_user()
+
+    flash(
+        "Logged Out Successfully",
+        "info",
+    )
 
     return redirect(
         url_for("auth.login")

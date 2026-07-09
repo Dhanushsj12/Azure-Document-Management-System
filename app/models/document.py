@@ -1,5 +1,5 @@
 from datetime import datetime
-from zoneinfo import ZoneInfo
+
 from app.extensions import db
 
 
@@ -26,7 +26,7 @@ class Document(db.Model):
 
     created_at = db.Column(
         db.DateTime,
-        default=lambda: datetime.now(ZoneInfo("Asia/Kolkata"))
+        default=datetime.utcnow
     )
 
     owner = db.relationship(

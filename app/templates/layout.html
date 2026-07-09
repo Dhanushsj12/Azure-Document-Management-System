@@ -21,61 +21,61 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 
-<div class="container-fluid">
+    <div class="container-fluid">
 
-<a class="navbar-brand"
+        <a class="navbar-brand"
+           href="{{ url_for('dashboard.dashboard') }}">
 
-href="{{ url_for('dashboard.dashboard') }}">
+            📄 Document Management System
 
-📄 Document Management System
+        </a>
 
-</a>
+        <div>
 
-<div>
+            <a
+                href="{{ url_for('dashboard.dashboard') }}"
+                class="btn btn-outline-light btn-sm">
 
-<a
+                Dashboard
 
-href="{{ url_for('dashboard.dashboard') }}"
+            </a>
 
-class="btn btn-outline-light btn-sm">
+            <a
+                href="{{ url_for('document.documents') }}"
+                class="btn btn-outline-light btn-sm">
 
-Dashboard
+                Documents
 
-</a>
+            </a>
 
-<a
+            <a
+                href="{{ url_for('document.upload') }}"
+                class="btn btn-outline-light btn-sm">
 
-href="{{ url_for('document.documents') }}"
+                Upload
 
-class="btn btn-outline-light btn-sm">
+            </a>
 
-Documents
+            <!-- NEW BUTTON -->
+            <a
+                href="{{ url_for('audit.audit_logs') }}"
+                class="btn btn-outline-info btn-sm">
 
-</a>
+                Audit Logs
 
-<a
+            </a>
 
-href="{{ url_for('document.upload') }}"
+            <a
+                href="{{ url_for('auth.logout') }}"
+                class="btn btn-danger btn-sm">
 
-class="btn btn-outline-light btn-sm">
+                Logout
 
-Upload
+            </a>
 
-</a>
+        </div>
 
-<a
-
-href="{{ url_for('auth.logout') }}"
-
-class="btn btn-danger btn-sm">
-
-Logout
-
-</a>
-
-</div>
-
-</div>
+    </div>
 
 </nav>
 
@@ -85,13 +85,16 @@ Logout
 
         {% if messages %}
 
-            {% for category,message in messages %}
+            {% for category, message in messages %}
 
-                <div class="alert alert-{{category}} alert-dismissible fade show">
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
 
-                    {{message}}
+                    {{ message }}
 
-                    <button class="btn-close" data-bs-dismiss="alert"></button>
+                    <button
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                    </button>
 
                 </div>
 
@@ -102,7 +105,6 @@ Logout
     {% endwith %}
 
     {% block content %}
-
     {% endblock %}
 
 </div>

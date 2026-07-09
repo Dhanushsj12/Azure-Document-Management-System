@@ -19,6 +19,7 @@ from app.extensions import db
 from app.models.document import Document
 from app.models.version import Version
 from app.services.version_service import VersionService
+from app.services.audit_service import AuditService
 
 document_bp = Blueprint(
     "document",
@@ -78,6 +79,15 @@ def upload():
                 current_user.id,
             )
 
+            # -----------------------------
+            # Audit Log
+            # -----------------------------
+            AuditService.log(
+                user_id=current_user.id,
+                action="Upload",
+                document_name=file.filename,
+            )
+
             flash(
                 "Document Uploaded Successfully",
                 "success",
@@ -112,6 +122,15 @@ def download(id):
         .first()
     )
 
+    # -----------------------------
+    # Audit Log
+    # -----------------------------
+    AuditService.log(
+        user_id=current_user.id,
+        action="Download",
+        document_name=document.title,
+    )
+
     return send_file(
         latest_version.file_path,
         as_attachment=True,
@@ -130,6 +149,15 @@ def download_version(version_id):
 
     document = Document.query.get_or_404(
         version.document_id
+    )
+
+    # -----------------------------
+    # Audit Log
+    # -----------------------------
+    AuditService.log(
+        user_id=current_user.id,
+        action=f"Download Version {version.version_number}",
+        document_name=document.title,
     )
 
     return send_file(
@@ -174,6 +202,9 @@ def delete(id):
 
     document = Document.query.get_or_404(id)
 
+    # Save title before deleting
+    document_title = document.title
+
     versions = Version.query.filter_by(
         document_id=id
     ).all()
@@ -191,6 +222,15 @@ def delete(id):
     db.session.delete(document)
 
     db.session.commit()
+
+    # -----------------------------
+    # Audit Log
+    # -----------------------------
+    AuditService.log(
+        user_id=current_user.id,
+        action="Delete",
+        document_name=document_title,
+    )
 
     flash(
         "Document Deleted Successfully",

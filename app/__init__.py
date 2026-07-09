@@ -1,8 +1,9 @@
 from flask import Flask
-
+from app.routes.audit import audit_bp
 from app.config import Config
 from app.extensions import db, login_manager, bcrypt, migrate
-
+from app.models.version import Version
+from app.models.audit import Audit
 from app.routes.auth import auth_bp
 from app.routes.dashboard import dashboard_bp
 from app.routes.document import document_bp
@@ -21,7 +22,7 @@ def create_app():
     migrate.init_app(app, db)
 
     login_manager.login_view = "auth.login"
-
+    app.register_blueprint(audit_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(document_bp)
