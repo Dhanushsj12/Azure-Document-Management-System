@@ -1,30 +1,11 @@
-import os
 import uuid
+import os
 
 from app.extensions import db
 from app.models.document import Document
 from app.models.version import Version
-
-# -------------------------------------------------
-# Absolute Upload Folder
-# -------------------------------------------------
-
-BASE_DIR = os.path.abspath(
-    os.path.join(
-        os.path.dirname(__file__),
-        "..",
-        "..",
-    )
-)
-
-UPLOAD_FOLDER = os.path.join(
-    BASE_DIR,
-    "app",
-    "static",
-    "uploads",
-)
-
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+from app.services.blob_service import BlobService
+from app.services.audit_service import AuditService
 
 
 class VersionService:
@@ -32,10 +13,7 @@ class VersionService:
     @staticmethod
     def upload(file, user_id):
 
-        # -----------------------------------------
-        # Check whether document already exists
-        # -----------------------------------------
-
+        # Find existing document
         document = Document.query.filter_by(
             title=file.filename
         ).first()
@@ -54,7 +32,7 @@ class VersionService:
 
                 owner_id=user_id,
 
-                latest_version=1,
+                latest_version=1
 
             )
 
@@ -64,28 +42,20 @@ class VersionService:
 
             version_number = 1
 
-        # -----------------------------------------
-        # Generate Unique Filename
-        # -----------------------------------------
+        # Create unique blob filename
 
-        extension = file.filename.rsplit(".", 1)[-1]
+        extension = os.path.splitext(file.filename)[1]
 
-        unique_filename = f"{uuid.uuid4()}.{extension}"
+        unique_name = f"{uuid.uuid4()}{extension}"
 
-        full_path = os.path.join(
-            UPLOAD_FOLDER,
-            unique_filename,
+        # Upload to Azure Blob Storage
+
+        blob_url = BlobService.upload_file(
+            file,
+            unique_name
         )
 
-        # -----------------------------------------
-        # Save File
-        # -----------------------------------------
-
-        file.save(full_path)
-
-        # -----------------------------------------
-        # Save Version Information
-        # -----------------------------------------
+        # Store metadata
 
         version = Version(
 
@@ -95,14 +65,24 @@ class VersionService:
 
             uploaded_by=user_id,
 
-            file_size=os.path.getsize(full_path),
+            file_size=file.content_length if file.content_length else 0,
 
-            file_path=full_path,
+            file_path=blob_url
 
         )
 
         db.session.add(version)
 
         db.session.commit()
+
+        AuditService.log(
+
+            user_id=user_id,
+
+            action="Upload",
+
+            document_name=document.title
+
+        )
 
         return document

@@ -1,4 +1,5 @@
 import os
+from io import BytesIO
 
 from flask import (
     Blueprint,
@@ -18,7 +19,9 @@ from flask_login import (
 from app.extensions import db
 from app.models.document import Document
 from app.models.version import Version
+
 from app.services.version_service import VersionService
+from app.services.blob_service import BlobService
 from app.services.audit_service import AuditService
 
 document_bp = Blueprint(
@@ -62,7 +65,7 @@ def documents():
 
 
 # -------------------------------------------------
-# Upload Document
+# Upload
 # -------------------------------------------------
 @document_bp.route("/upload", methods=["GET", "POST"])
 @login_required
@@ -77,15 +80,6 @@ def upload():
             VersionService.upload(
                 file,
                 current_user.id,
-            )
-
-            # -----------------------------
-            # Audit Log
-            # -----------------------------
-            AuditService.log(
-                user_id=current_user.id,
-                action="Upload",
-                document_name=file.filename,
             )
 
             flash(
@@ -122,19 +116,28 @@ def download(id):
         .first()
     )
 
-    # -----------------------------
-    # Audit Log
-    # -----------------------------
+    blob_name = latest_version.file_path.split("/")[-1]
+
+    data = BlobService.download_blob(
+        blob_name
+    )
+
     AuditService.log(
-        user_id=current_user.id,
-        action="Download",
-        document_name=document.title,
+        current_user.id,
+        "Download",
+        document.title
     )
 
     return send_file(
-        latest_version.file_path,
+
+        BytesIO(data),
+
         as_attachment=True,
+
         download_name=document.title,
+
+        mimetype="application/octet-stream"
+
     )
 
 
@@ -147,23 +150,30 @@ def download_version(version_id):
 
     version = Version.query.get_or_404(version_id)
 
-    document = Document.query.get_or_404(
-        version.document_id
+    document = Document.query.get(version.document_id)
+
+    blob_name = version.file_path.split("/")[-1]
+
+    data = BlobService.download_blob(
+        blob_name
     )
 
-    # -----------------------------
-    # Audit Log
-    # -----------------------------
     AuditService.log(
-        user_id=current_user.id,
-        action=f"Download Version {version.version_number}",
-        document_name=document.title,
+        current_user.id,
+        "Download",
+        document.title
     )
 
     return send_file(
-        version.file_path,
+
+        BytesIO(data),
+
         as_attachment=True,
+
         download_name=document.title,
+
+        mimetype="application/octet-stream"
+
     )
 
 
@@ -194,7 +204,7 @@ def history(id):
 
 
 # -------------------------------------------------
-# Delete Document
+# Delete
 # -------------------------------------------------
 @document_bp.route("/delete/<int:id>")
 @login_required
@@ -202,20 +212,17 @@ def delete(id):
 
     document = Document.query.get_or_404(id)
 
-    # Save title before deleting
-    document_title = document.title
-
     versions = Version.query.filter_by(
         document_id=id
     ).all()
 
     for version in versions:
 
-        if (
-            version.file_path
-            and os.path.exists(version.file_path)
-        ):
-            os.remove(version.file_path)
+        blob_name = version.file_path.split("/")[-1]
+
+        BlobService.delete_blob(
+            blob_name
+        )
 
         db.session.delete(version)
 
@@ -223,13 +230,10 @@ def delete(id):
 
     db.session.commit()
 
-    # -----------------------------
-    # Audit Log
-    # -----------------------------
     AuditService.log(
-        user_id=current_user.id,
-        action="Delete",
-        document_name=document_title,
+        current_user.id,
+        "Delete",
+        document.title
     )
 
     flash(
