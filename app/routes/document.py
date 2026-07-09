@@ -24,6 +24,7 @@ from app.services.version_service import VersionService
 from app.services.blob_service import BlobService
 from app.services.audit_service import AuditService
 
+
 document_bp = Blueprint(
     "document",
     __name__,
@@ -31,7 +32,7 @@ document_bp = Blueprint(
 
 
 # -------------------------------------------------
-# View All Documents + Search
+# View Documents
 # -------------------------------------------------
 @document_bp.route("/documents")
 @login_required
@@ -111,12 +112,16 @@ def download(id):
     document = Document.query.get_or_404(id)
 
     latest_version = (
-        Version.query.filter_by(document_id=id)
-        .order_by(Version.version_number.desc())
+        Version.query.filter_by(
+            document_id=id
+        )
+        .order_by(
+            Version.version_number.desc()
+        )
         .first()
     )
 
-    blob_name = latest_version.file_path.split("/")[-1]
+    blob_name = document.title
 
     data = BlobService.download_blob(
         blob_name
@@ -150,17 +155,20 @@ def download_version(version_id):
 
     version = Version.query.get_or_404(version_id)
 
-    document = Document.query.get(version.document_id)
+    document = version.document
 
-    blob_name = version.file_path.split("/")[-1]
+    blob_name = document.title
 
-    data = BlobService.download_blob(
-        blob_name
+    blob_client = BlobService.container_client.get_blob_client(
+        blob_name,
+        version_id=version.azure_version_id
     )
+
+    data = blob_client.download_blob().readall()
 
     AuditService.log(
         current_user.id,
-        "Download",
+        "Download Version",
         document.title
     )
 
@@ -204,6 +212,33 @@ def history(id):
 
 
 # -------------------------------------------------
+# Restore Version
+# -------------------------------------------------
+# ----------------------------------------
+# Restore Previous Version
+# ----------------------------------------
+@document_bp.route("/restore/<int:version_id>")
+@login_required
+def restore_version(version_id):
+
+    version = Version.query.get_or_404(version_id)
+
+    document_id = version.document_id
+
+    VersionService.restore(version_id)
+
+    flash(
+        "Version Restored Successfully.",
+        "success"
+    )
+
+    return redirect(
+        url_for(
+            "document.history",
+            id=document_id
+        )
+    )
+# -------------------------------------------------
 # Delete
 # -------------------------------------------------
 @document_bp.route("/delete/<int:id>")
@@ -216,13 +251,13 @@ def delete(id):
         document_id=id
     ).all()
 
+    blob_name = document.title
+
+    BlobService.delete_blob(
+        blob_name
+    )
+
     for version in versions:
-
-        blob_name = version.file_path.split("/")[-1]
-
-        BlobService.delete_blob(
-            blob_name
-        )
 
         db.session.delete(version)
 

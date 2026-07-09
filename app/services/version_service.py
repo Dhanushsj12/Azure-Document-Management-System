@@ -1,4 +1,3 @@
-import uuid
 import os
 
 from app.extensions import db
@@ -13,7 +12,7 @@ class VersionService:
     @staticmethod
     def upload(file, user_id):
 
-        # Find existing document
+        # Check whether document already exists
         document = Document.query.filter_by(
             title=file.filename
         ).first()
@@ -21,7 +20,6 @@ class VersionService:
         if document:
 
             version_number = document.latest_version + 1
-
             document.latest_version = version_number
 
         else:
@@ -37,25 +35,21 @@ class VersionService:
             )
 
             db.session.add(document)
-
             db.session.flush()
 
             version_number = 1
 
-        # Create unique blob filename
+        # Upload using ORIGINAL filename
+        # Azure automatically creates previous versions
 
-        extension = os.path.splitext(file.filename)[1]
+        blob_name = document.title
 
-        unique_name = f"{uuid.uuid4()}{extension}"
-
-        # Upload to Azure Blob Storage
-
-        blob_url = BlobService.upload_file(
+        blob = BlobService.upload_file(
             file,
-            unique_name
+            blob_name
         )
 
-        # Store metadata
+        print("Azure Upload Result:", blob)
 
         version = Version(
 
@@ -67,7 +61,9 @@ class VersionService:
 
             file_size=file.content_length if file.content_length else 0,
 
-            file_path=blob_url
+            file_path=blob["url"],
+
+            azure_version_id=blob["version_id"]
 
         )
 
@@ -86,3 +82,32 @@ class VersionService:
         )
 
         return document
+
+    @staticmethod
+    def restore(version_id):
+
+        version = Version.query.get_or_404(
+            version_id
+        )
+
+        blob_name = version.document.title
+
+        BlobService.restore_version(
+
+            blob_name,
+
+            version.azure_version_id
+
+        )
+
+        AuditService.log(
+
+            user_id=version.uploaded_by,
+
+            action="Restore",
+
+            document_name=version.document.title
+
+        )
+
+        return True

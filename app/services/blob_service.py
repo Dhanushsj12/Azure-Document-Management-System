@@ -1,7 +1,7 @@
 import os
 
-from azure.storage.blob import BlobServiceClient
 from dotenv import load_dotenv
+from azure.storage.blob import BlobServiceClient
 
 load_dotenv()
 
@@ -24,6 +24,9 @@ class BlobService:
         container_name
     )
 
+    # ---------------------------------------------------
+    # Upload File
+    # ---------------------------------------------------
     @staticmethod
     def upload_file(file, blob_name):
 
@@ -31,24 +34,42 @@ class BlobService:
             blob_name
         )
 
-        file.seek(0)
+        # Always rewind the stream
+        file.stream.seek(0)
 
         blob_client.upload_blob(
-            file,
-            overwrite=True
+            data=file.stream,
+            overwrite=True,
+            content_type=file.content_type
         )
 
-        return blob_client.url
+        properties = blob_client.get_blob_properties()
 
+        return {
+            "url": blob_client.url,
+            "version_id": properties.version_id
+        }
+
+    # ---------------------------------------------------
+    # Download Latest / Specific Version
+    # ---------------------------------------------------
     @staticmethod
-    def download_blob(blob_name):
+    def download_blob(
+        blob_name,
+        version_id=None
+    ):
 
         blob_client = BlobService.container_client.get_blob_client(
             blob_name
         )
 
-        return blob_client.download_blob().readall()
+        return blob_client.download_blob(
+            version_id=version_id
+        ).readall()
 
+    # ---------------------------------------------------
+    # Delete Blob
+    # ---------------------------------------------------
     @staticmethod
     def delete_blob(blob_name):
 
@@ -56,4 +77,32 @@ class BlobService:
             blob_name
         )
 
-        blob_client.delete_blob()
+        blob_client.delete_blob(
+            delete_snapshots="include"
+        )
+
+    # ---------------------------------------------------
+    # Restore Previous Version
+    # ---------------------------------------------------
+    @staticmethod
+    def restore_version(
+        blob_name,
+        version_id
+    ):
+
+        blob_client = BlobService.container_client.get_blob_client(
+            blob_name
+        )
+
+        data = blob_client.download_blob(
+            version_id=version_id
+        ).readall()
+
+        blob_client.upload_blob(
+            data,
+            overwrite=True
+        )
+
+        properties = blob_client.get_blob_properties()
+
+        return properties.version_id

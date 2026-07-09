@@ -91,10 +91,20 @@
 
                         <td>
 
-                            <a href="{{ url_for('document.download_version', version_id=version.id) }}"
+                            <a href="{{ url_for('document.download_version',
+                                                version_id=version.id) }}"
                                class="btn btn-success btn-sm">
 
                                 ⬇ Download
+
+                            </a>
+
+                            <a href="{{ url_for('document.restore_version',
+                                                version_id=version.id) }}"
+                               class="btn btn-warning btn-sm"
+                               onclick="return confirm('Are you sure you want to restore this version?')">
+
+                                ♻ Restore
 
                             </a>
 

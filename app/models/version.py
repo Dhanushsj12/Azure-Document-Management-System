@@ -7,7 +7,10 @@ class Version(db.Model):
 
     __tablename__ = "versions"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     document_id = db.Column(
         db.Integer,
@@ -29,6 +32,12 @@ class Version(db.Model):
         db.Integer
     )
 
+    # Azure Blob Version ID
+    azure_version_id = db.Column(
+        db.String(255),
+        nullable=True
+    )
+
     uploaded_at = db.Column(
         db.DateTime,
         default=datetime.utcnow
@@ -45,4 +54,7 @@ class Version(db.Model):
     )
 
     def __repr__(self):
-        return f"<Version {self.version_number}>"
+        return (
+            f"<Version {self.version_number} "
+            f"AzureVersion={self.azure_version_id}>"
+        )
