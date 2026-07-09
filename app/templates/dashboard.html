@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+
+Dashboard
+
+</h2>
+
+<div class="row g-4">
+
+<div class="col-md-3">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h5>Total Documents</h5>
+
+<h1>{{ total_documents }}</h1>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h5>Total Users</h5>
+
+<h1>{{ total_users }}</h1>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h5>Storage Used</h5>
+
+<h1>0 MB</h1>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h5>Versions</h5>
+
+<h1>{{ total_versions }}</h1>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card shadow mt-5">
+
+<div class="card-header">
+
+Quick Actions
+
+</div>
+
+<div class="card-body">
+
+<a
+
+href="{{ url_for('document.upload') }}"
+
+class="btn btn-primary">
+
+Upload Document
+
+</a>
+
+<a
+
+href="{{ url_for('document.documents') }}"
+
+class="btn btn-success">
+
+View Documents
+
+</a>
+
+</div>
+
+</div>
+
+{% endblock %}

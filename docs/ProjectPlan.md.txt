@@ -1,0 +1,31 @@
+# Document Management System with Version Control
+
+## Objective
+Develop a secure cloud-based document management system using Microsoft Azure.
+
+## Technology Stack
+
+Frontend
+- HTML
+- CSS
+- Bootstrap
+- JavaScript
+
+Backend
+- Python
+- Flask
+
+Database
+- Azure SQL Database
+
+Storage
+- Azure Blob Storage
+
+Cloud
+- Microsoft Azure
+
+Authentication
+- Flask Login
+
+Deployment
+- Azure App Services
