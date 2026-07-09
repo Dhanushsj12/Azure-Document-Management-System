@@ -20,10 +20,11 @@ def dashboard():
     total_documents = Document.query.count()
 
     total_versions = Version.query.count()
-
+    total_storage = 0
     return render_template(
         "dashboard.html",
         total_users=total_users,
         total_documents=total_documents,
         total_versions=total_versions,
+        total_storage=total_storage,
     )

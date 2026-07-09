@@ -4,40 +4,53 @@
 
 {% block content %}
 
+<!-- Page Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <h2>
-        📁 Documents
-    </h2>
+    <h2>📁 Documents</h2>
 
     <a href="{{ url_for('document.upload') }}" class="btn btn-primary">
-
         Upload Document
-
     </a>
 
 </div>
 
+<!-- Search Bar -->
+<form method="GET" class="mb-4">
+
+    <div class="input-group">
+
+        <input
+            type="text"
+            name="search"
+            class="form-control"
+            placeholder="🔍 Search Documents..."
+            value="{{ search }}"
+        >
+
+        <button type="submit" class="btn btn-primary">
+            Search
+        </button>
+
+    </div>
+
+</form>
+
+<!-- Documents Table -->
 <div class="card shadow">
 
     <div class="card-body">
 
         <table class="table table-hover align-middle">
 
-            <thead>
+            <thead class="table-dark">
 
                 <tr>
 
                     <th>ID</th>
-
-                    <th>Filename</th>
-
-                    <th>Version</th>
-
-                    <th>Size</th>
-
-                    <th>Uploaded</th>
-
+                    <th>Document Name</th>
+                    <th>Latest Version</th>
+                    <th>Created On</th>
                     <th>Actions</th>
 
                 </tr>
@@ -46,45 +59,48 @@
 
             <tbody>
 
-            {% for doc in documents %}
+                {% for doc in documents %}
 
                 <tr>
 
                     <td>{{ doc.id }}</td>
 
-                    <td>{{ doc.original_filename }}</td>
+                    <td>{{ doc.title }}</td>
 
-                    <td>v{{ doc.version }}</td>
+                    <td>
+                        Version {{ doc.latest_version }}
+                    </td>
 
-                    <td>{{ "%.2f"|format(doc.file_size/1024) }} KB</td>
-
-                    <td>{{ doc.uploaded_at.strftime("%d-%m-%Y %H:%M") }}</td>
+                    <td>
+                        {{ doc.created_at.strftime("%d-%m-%Y %H:%M") }}
+                    </td>
 
                     <td>
 
-                        <a href="{{ url_for('document.download', id=doc.id) }}"
-                           class="btn btn-success btn-sm">
-
+                        <a
+                            href="{{ url_for('document.download', id=doc.id) }}"
+                            class="btn btn-success btn-sm"
+                        >
                             Download
-
                         </a>
 
-                        <a href="{{ url_for('document.delete', id=doc.id) }}"
-                           class="btn btn-danger btn-sm">
-
+                        <a
+                            href="{{ url_for('document.delete', id=doc.id) }}"
+                            class="btn btn-danger btn-sm"
+                            onclick="return confirm('Are you sure you want to delete this document?');"
+                        >
                             Delete
-
                         </a>
 
                     </td>
 
                 </tr>
 
-            {% else %}
+                {% else %}
 
                 <tr>
 
-                    <td colspan="6" class="text-center">
+                    <td colspan="5" class="text-center text-muted">
 
                         No Documents Uploaded
 
@@ -92,7 +108,7 @@
 
                 </tr>
 
-            {% endfor %}
+                {% endfor %}
 
             </tbody>
 

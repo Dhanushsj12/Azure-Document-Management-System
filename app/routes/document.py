@@ -25,19 +25,36 @@ document_bp = Blueprint(
 
 
 # -----------------------------
-# View All Documents
+# View All Documents + Search
 # -----------------------------
 @document_bp.route("/documents")
 @login_required
 def documents():
 
-    documents = Document.query.order_by(
-        Document.created_at.desc()
-    ).all()
+    search = request.args.get("search", "").strip()
+
+    if search:
+
+        documents = (
+            Document.query.filter(
+                Document.title.ilike(f"%{search}%")
+            )
+            .order_by(Document.created_at.desc())
+            .all()
+        )
+
+    else:
+
+        documents = (
+            Document.query.order_by(
+                Document.created_at.desc()
+            ).all()
+        )
 
     return render_template(
         "documents.html",
         documents=documents,
+        search=search,
     )
 
 
