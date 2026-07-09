@@ -2,19 +2,39 @@ import os
 import uuid
 
 from app.extensions import db
-
 from app.models.document import Document
-
 from app.models.version import Version
 
+# -------------------------------------------------
+# Absolute Upload Folder
+# -------------------------------------------------
 
-UPLOAD_FOLDER = "app/static/uploads"
+BASE_DIR = os.path.abspath(
+    os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "..",
+    )
+)
+
+UPLOAD_FOLDER = os.path.join(
+    BASE_DIR,
+    "app",
+    "static",
+    "uploads",
+)
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 class VersionService:
 
     @staticmethod
     def upload(file, user_id):
+
+        # -----------------------------------------
+        # Check whether document already exists
+        # -----------------------------------------
 
         document = Document.query.filter_by(
             title=file.filename
@@ -34,7 +54,7 @@ class VersionService:
 
                 owner_id=user_id,
 
-                latest_version=1
+                latest_version=1,
 
             )
 
@@ -44,16 +64,28 @@ class VersionService:
 
             version_number = 1
 
-        extension = file.filename.split(".")[-1]
+        # -----------------------------------------
+        # Generate Unique Filename
+        # -----------------------------------------
 
-        unique_name = f"{uuid.uuid4()}.{extension}"
+        extension = file.filename.rsplit(".", 1)[-1]
 
-        path = os.path.join(
+        unique_filename = f"{uuid.uuid4()}.{extension}"
+
+        full_path = os.path.join(
             UPLOAD_FOLDER,
-            unique_name
+            unique_filename,
         )
 
-        file.save(path)
+        # -----------------------------------------
+        # Save File
+        # -----------------------------------------
+
+        file.save(full_path)
+
+        # -----------------------------------------
+        # Save Version Information
+        # -----------------------------------------
 
         version = Version(
 
@@ -63,9 +95,9 @@ class VersionService:
 
             uploaded_by=user_id,
 
-            file_size=os.path.getsize(path),
+            file_size=os.path.getsize(full_path),
 
-            file_path=path
+            file_path=full_path,
 
         )
 

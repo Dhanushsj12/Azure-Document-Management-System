@@ -1,4 +1,5 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from app.extensions import db
 
@@ -31,7 +32,7 @@ class Version(db.Model):
 
     uploaded_at = db.Column(
         db.DateTime,
-        default=datetime.utcnow
+        default=lambda: datetime.now(ZoneInfo("Asia/Kolkata"))
     )
 
     uploaded_by = db.Column(

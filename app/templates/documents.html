@@ -4,18 +4,28 @@
 
 {% block content %}
 
+<!-- ========================= -->
 <!-- Page Header -->
+<!-- ========================= -->
+
 <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <h2>📁 Documents</h2>
+    <h2>📁 Document Management</h2>
 
-    <a href="{{ url_for('document.upload') }}" class="btn btn-primary">
-        Upload Document
+    <a href="{{ url_for('document.upload') }}"
+       class="btn btn-primary">
+
+        ➕ Upload Document
+
     </a>
 
 </div>
 
-<!-- Search Bar -->
+
+<!-- ========================= -->
+<!-- Search -->
+<!-- ========================= -->
+
 <form method="GET" class="mb-4">
 
     <div class="input-group">
@@ -28,16 +38,34 @@
             value="{{ search }}"
         >
 
-        <button type="submit" class="btn btn-primary">
+        <button
+            class="btn btn-primary"
+            type="submit">
+
             Search
+
         </button>
 
     </div>
 
 </form>
 
+
+<!-- ========================= -->
 <!-- Documents Table -->
+<!-- ========================= -->
+
 <div class="card shadow">
+
+    <div class="card-header bg-primary text-white">
+
+        <h5 class="mb-0">
+
+            Uploaded Documents
+
+        </h5>
+
+    </div>
 
     <div class="card-body">
 
@@ -48,10 +76,18 @@
                 <tr>
 
                     <th>ID</th>
+
                     <th>Document Name</th>
+
                     <th>Latest Version</th>
+
                     <th>Created On</th>
-                    <th>Actions</th>
+
+                    <th width="340">
+
+                        Actions
+
+                    </th>
 
                 </tr>
 
@@ -59,56 +95,83 @@
 
             <tbody>
 
-                {% for doc in documents %}
+            {% for doc in documents %}
 
                 <tr>
 
-                    <td>{{ doc.id }}</td>
-
-                    <td>{{ doc.title }}</td>
-
                     <td>
-                        Version {{ doc.latest_version }}
+
+                        {{ doc.id }}
+
                     </td>
 
                     <td>
+
+                        📄 {{ doc.title }}
+
+                    </td>
+
+                    <td>
+
+                        <span class="badge bg-success">
+
+                            Version {{ doc.latest_version }}
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
                         {{ doc.created_at.strftime("%d-%m-%Y %H:%M") }}
+
                     </td>
 
                     <td>
 
                         <a
                             href="{{ url_for('document.download', id=doc.id) }}"
-                            class="btn btn-success btn-sm"
-                        >
-                            Download
+                            class="btn btn-success btn-sm">
+
+                            ⬇ Download
+
+                        </a>
+
+                        <a
+                            href="{{ url_for('document.history', id=doc.id) }}"
+                            class="btn btn-info btn-sm">
+
+                            📜 History
+
                         </a>
 
                         <a
                             href="{{ url_for('document.delete', id=doc.id) }}"
                             class="btn btn-danger btn-sm"
-                            onclick="return confirm('Are you sure you want to delete this document?');"
-                        >
-                            Delete
+                            onclick="return confirm('Delete this document?');">
+
+                            🗑 Delete
+
                         </a>
 
                     </td>
 
                 </tr>
 
-                {% else %}
+            {% else %}
 
                 <tr>
 
-                    <td colspan="5" class="text-center text-muted">
+                    <td colspan="5"
+                        class="text-center text-muted">
 
-                        No Documents Uploaded
+                        No Documents Found
 
                     </td>
 
                 </tr>
 
-                {% endfor %}
+            {% endfor %}
 
             </tbody>
 

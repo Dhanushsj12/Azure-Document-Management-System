@@ -15,7 +15,9 @@ from flask_login import (
     current_user,
 )
 
+from app.extensions import db
 from app.models.document import Document
+from app.models.version import Version
 from app.services.version_service import VersionService
 
 document_bp = Blueprint(
@@ -24,9 +26,9 @@ document_bp = Blueprint(
 )
 
 
-# -----------------------------
+# -------------------------------------------------
 # View All Documents + Search
-# -----------------------------
+# -------------------------------------------------
 @document_bp.route("/documents")
 @login_required
 def documents():
@@ -58,9 +60,9 @@ def documents():
     )
 
 
-# -----------------------------
+# -------------------------------------------------
 # Upload Document
-# -----------------------------
+# -------------------------------------------------
 @document_bp.route("/upload", methods=["GET", "POST"])
 @login_required
 def upload():
@@ -95,20 +97,20 @@ def upload():
     )
 
 
-# -----------------------------
-# Download Document
-# -----------------------------
+# -------------------------------------------------
+# Download Latest Version
+# -------------------------------------------------
 @document_bp.route("/download/<int:id>")
 @login_required
 def download(id):
 
     document = Document.query.get_or_404(id)
 
-    latest_version = sorted(
-        document.versions,
-        key=lambda x: x.version_number,
-        reverse=True,
-    )[0]
+    latest_version = (
+        Version.query.filter_by(document_id=id)
+        .order_by(Version.version_number.desc())
+        .first()
+    )
 
     return send_file(
         latest_version.file_path,
@@ -117,25 +119,73 @@ def download(id):
     )
 
 
-# -----------------------------
+# -------------------------------------------------
+# Download Specific Version
+# -------------------------------------------------
+@document_bp.route("/download/version/<int:version_id>")
+@login_required
+def download_version(version_id):
+
+    version = Version.query.get_or_404(version_id)
+
+    document = Document.query.get_or_404(
+        version.document_id
+    )
+
+    return send_file(
+        version.file_path,
+        as_attachment=True,
+        download_name=document.title,
+    )
+
+
+# -------------------------------------------------
+# Version History
+# -------------------------------------------------
+@document_bp.route("/history/<int:id>")
+@login_required
+def history(id):
+
+    document = Document.query.get_or_404(id)
+
+    versions = (
+        Version.query.filter_by(
+            document_id=id
+        )
+        .order_by(
+            Version.version_number.desc()
+        )
+        .all()
+    )
+
+    return render_template(
+        "version_history.html",
+        document=document,
+        versions=versions,
+    )
+
+
+# -------------------------------------------------
 # Delete Document
-# -----------------------------
+# -------------------------------------------------
 @document_bp.route("/delete/<int:id>")
 @login_required
 def delete(id):
 
     document = Document.query.get_or_404(id)
 
-    # Delete all version files
-    for version in document.versions:
+    versions = Version.query.filter_by(
+        document_id=id
+    ).all()
 
-        if os.path.exists(version.file_path):
+    for version in versions:
+
+        if (
+            version.file_path
+            and os.path.exists(version.file_path)
+        ):
             os.remove(version.file_path)
 
-    # Delete database records
-    from app.extensions import db
-
-    for version in document.versions:
         db.session.delete(version)
 
     db.session.delete(document)
@@ -148,5 +198,5 @@ def delete(id):
     )
 
     return redirect(
-        url_for("document.documents"),
+        url_for("document.documents")
     )

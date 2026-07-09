@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+
+{% block title %}Version History{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2>📜 Version History</h2>
+
+            <h5 class="text-muted">
+
+                {{ document.title }}
+
+            </h5>
+
+        </div>
+
+        <a href="{{ url_for('document.documents') }}"
+           class="btn btn-secondary">
+
+            ← Back to Documents
+
+        </a>
+
+    </div>
+
+    <div class="card shadow">
+
+        <div class="card-header bg-dark text-white">
+
+            <h5 class="mb-0">
+
+                All Versions
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-hover align-middle">
+
+                <thead class="table-primary">
+
+                    <tr>
+
+                        <th>Version</th>
+
+                        <th>Uploaded Date</th>
+
+                        <th>File Size</th>
+
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for version in versions %}
+
+                    <tr>
+
+                        <td>
+
+                            <span class="badge bg-success">
+
+                                Version {{ version.version_number }}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            {{ version.uploaded_at.strftime("%d-%m-%Y %H:%M") }}
+
+                        </td>
+
+                        <td>
+
+                            {{ "%.2f"|format(version.file_size / 1024) }} KB
+
+                        </td>
+
+                        <td>
+
+                            <a href="{{ url_for('document.download_version', version_id=version.id) }}"
+                               class="btn btn-success btn-sm">
+
+                                ⬇ Download
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="4"
+                            class="text-center text-muted">
+
+                            No Versions Available
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
