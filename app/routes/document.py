@@ -120,6 +120,12 @@ def download(id):
         )
         .first()
     )
+    if latest_version.download_count is None:
+       latest_version.download_count = 0
+
+    latest_version.download_count += 1
+
+    db.session.commit()
 
     blob_name = document.title
 
@@ -154,7 +160,12 @@ def download(id):
 def download_version(version_id):
 
     version = Version.query.get_or_404(version_id)
+    if version.download_count is None:
+       version.download_count = 0
 
+    version.download_count += 1
+
+    db.session.commit()
     document = version.document
 
     blob_name = document.title

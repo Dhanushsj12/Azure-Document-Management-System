@@ -4,38 +4,40 @@
 
 {% block content %}
 
-<div class="container mt-4">
+    <div class="page-header">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <h2>📋 Audit Logs</h2>
+        <h2><i class="bi bi-clock-history"></i> Audit Logs</h2>
 
         <a href="{{ url_for('dashboard.dashboard') }}"
            class="btn btn-secondary">
 
-            ← Dashboard
+            <i class="bi bi-arrow-left"></i> Dashboard
 
         </a>
 
     </div>
 
-    <div class="card shadow">
+    <div class="alert alert-info d-flex align-items-center gap-2 mb-3">
 
-        <div class="card-header bg-dark text-white">
+        <i class="bi bi-info-circle-fill"></i>
 
-            <h5 class="mb-0">
+        <span><strong>Total Logs:</strong> {{ logs|length }}</span>
 
-                User Activity
+    </div>
 
-            </h5>
+    <div class="card">
+
+        <div class="card-header">
+
+            <i class="bi bi-person-lines-fill"></i> User Activity
 
         </div>
 
-        <div class="card-body">
+        <div class="card-body p-0">
 
-            <table class="table table-striped table-hover">
+            <table class="table table-hover align-middle mb-0">
 
-                <thead class="table-primary">
+                <thead>
 
                     <tr>
 
@@ -59,17 +61,48 @@
 
                     <tr>
 
-                        <td>{{ log.id }}</td>
+                        <td class="mono">{{ log.id }}</td>
 
                         <td>{{ log.user.full_name }}</td>
 
                         <td>
 
-                            <span class="badge bg-primary">
+                            {% if log.action == "Upload" %}
 
-                                {{ log.action }}
+<span class="status-pill">
+    <span class="status-dot status-dot--teal"></span>
+    Upload
+</span>
 
-                            </span>
+{% elif log.action == "Download" %}
+
+<span class="status-pill">
+    <span class="status-dot status-dot--primary"></span>
+    Download
+</span>
+
+{% elif log.action == "Delete" %}
+
+<span class="status-pill">
+    <span class="status-dot status-dot--red"></span>
+    Delete
+</span>
+
+{% elif log.action == "Restore" %}
+
+<span class="status-pill">
+    <span class="status-dot status-dot--amber"></span>
+    Restore
+</span>
+
+{% else %}
+
+<span class="status-pill">
+    <span class="status-dot status-dot--muted"></span>
+    {{ log.action }}
+</span>
+
+{% endif %}
 
                         </td>
 
@@ -79,7 +112,7 @@
 
                         </td>
 
-                        <td>
+                        <td class="mono">
 
                             {{ log.timestamp.strftime("%d-%m-%Y %H:%M") }}
 
@@ -109,7 +142,5 @@
         </div>
 
     </div>
-
-</div>
 
 {% endblock %}

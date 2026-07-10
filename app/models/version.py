@@ -29,13 +29,18 @@ class Version(db.Model):
     )
 
     file_size = db.Column(
-        db.Integer
+        db.Integer,
+        default=0
     )
 
-    # Azure Blob Version ID
     azure_version_id = db.Column(
-        db.String(255),
-        nullable=True
+        db.String(200)
+    )
+
+    # NEW
+    download_count = db.Column(
+        db.Integer,
+        default=0
     )
 
     uploaded_at = db.Column(
@@ -54,7 +59,5 @@ class Version(db.Model):
     )
 
     def __repr__(self):
-        return (
-            f"<Version {self.version_number} "
-            f"AzureVersion={self.azure_version_id}>"
-        )
+
+        return f"<Version {self.version_number}>"

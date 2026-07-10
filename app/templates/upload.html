@@ -12,16 +12,10 @@ Upload Document
 
 <div class="col-lg-6">
 
-<div class="card shadow">
+<div class="card">
 
-<div class="card-header bg-primary text-white">
-
-<h3>
-
-Upload Document
-
-</h3>
-
+<div class="card-header">
+    <i class="bi bi-cloud-upload-fill"></i> Upload Document
 </div>
 
 <div class="card-body">
@@ -30,9 +24,11 @@ Upload Document
 
       enctype="multipart/form-data">
 
-<div class="mb-3">
+<div class="upload-drop mb-3">
 
-<label class="form-label">
+<i class="bi bi-cloud-arrow-up"></i>
+
+<label class="form-label d-block mb-2">
 
 Choose File
 
@@ -56,15 +52,12 @@ required
 
 class="btn btn-primary">
 
-Upload
+<i class="bi bi-upload"></i> Upload
 
 </button>
 
-<a
-
-href="{{ url_for('document.documents') }}"
-
-class="btn btn-secondary">
+<a href="{{ url_for('document.documents') }}"
+   class="btn btn-secondary">
 
 Cancel
 

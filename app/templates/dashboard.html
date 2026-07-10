@@ -4,112 +4,175 @@
 
 {% block content %}
 
-<h2 class="mb-4">
+<div class="page-header">
 
-Dashboard
-
-</h2>
-
-<div class="row g-4">
-
-<div class="col-md-3">
-
-<div class="card shadow">
-
-<div class="card-body">
-
-<h5>Total Documents</h5>
-
-<h1>{{ total_documents }}</h1>
+    <div>
+        <h2><i class="bi bi-grid-1x2-fill"></i> Dashboard</h2>
+        <p class="page-subtitle">Document Management System Overview</p>
+    </div>
 
 </div>
 
-</div>
+    <div class="row g-3">
 
-</div>
+        <div class="col-lg-3 col-md-6">
 
-<div class="col-md-3">
+            <div class="stat-card stat-card--primary">
+                <div class="stat-top">
+                    <span class="stat-label">Total Documents</span>
+                    <span class="stat-icon"><i class="bi bi-file-earmark-text"></i></span>
+                </div>
+                <div class="stat-value">{{ total_documents }}</div>
+            </div>
 
-<div class="card shadow">
+        </div>
 
-<div class="card-body">
+        <div class="col-lg-3 col-md-6">
 
-<h5>Total Users</h5>
+            <div class="stat-card stat-card--teal">
+                <div class="stat-top">
+                    <span class="stat-label">Total Versions</span>
+                    <span class="stat-icon"><i class="bi bi-clock-history"></i></span>
+                </div>
+                <div class="stat-value">{{ total_versions }}</div>
+            </div>
 
-<h1>{{ total_users }}</h1>
+        </div>
 
-</div>
+        <div class="col-lg-3 col-md-6">
 
-</div>
+            <div class="stat-card stat-card--amber">
+                <div class="stat-top">
+                    <span class="stat-label">Total Users</span>
+                    <span class="stat-icon"><i class="bi bi-people-fill"></i></span>
+                </div>
+                <div class="stat-value">{{ total_users }}</div>
+            </div>
 
-</div>
+        </div>
 
-<div class="col-md-3">
+        <div class="col-lg-3 col-md-6">
 
-<div class="card shadow">
+            <div class="stat-card stat-card--red">
+                <div class="stat-top">
+                    <span class="stat-label">Storage Used</span>
+                    <span class="stat-icon"><i class="bi bi-hdd-fill"></i></span>
+                </div>
+                <div class="stat-value">{{ total_storage }} MB</div>
+            </div>
 
-<div class="card-body">
+        </div>
 
-<h5>Storage Used</h5>
+    </div>
 
-<h1>{{ total_storage }} MB</h1>
+    <div class="card mt-4">
 
-</div>
+        <div class="card-header">
+            <i class="bi bi-lightning-charge-fill"></i> Quick Actions
+        </div>
 
-</div>
+        <div class="card-body">
 
-</div>
+            <a href="{{ url_for('document.upload') }}"
+               class="btn btn-primary me-2">
 
-<div class="col-md-3">
+                <i class="bi bi-cloud-upload-fill"></i> Upload Document
 
-<div class="card shadow">
+            </a>
 
-<div class="card-body">
+            <a href="{{ url_for('document.documents') }}"
+               class="btn btn-success">
 
-<h5>Versions</h5>
+                <i class="bi bi-folder2-open"></i> View Documents
 
-<h1>{{ total_versions }}</h1>
+            </a>
 
-</div>
+        </div>
 
-</div>
+    </div>
 
-</div>
+    <div class="card mt-4">
 
-</div>
+        <div class="card-header">
+            <i class="bi bi-clock-fill"></i> Recent Uploads
+        </div>
 
-<div class="card shadow mt-5">
+        <div class="card-body p-0">
 
-<div class="card-header">
+            <table class="table table-hover mb-0">
 
-Quick Actions
+                <thead>
 
-</div>
+                    <tr>
 
-<div class="card-body">
+                        <th>Document</th>
 
-<a
+                        <th>Version</th>
 
-href="{{ url_for('document.upload') }}"
+                        <th>Size</th>
 
-class="btn btn-primary">
+                        <th>Uploaded</th>
 
-Upload Document
+                    </tr>
 
-</a>
+                </thead>
 
-<a
+                <tbody>
 
-href="{{ url_for('document.documents') }}"
+                    {% for version in recent_uploads %}
 
-class="btn btn-success">
+                    <tr>
 
-View Documents
+                        <td>
 
-</a>
+                            {{ version.document.title }}
 
-</div>
+                        </td>
 
-</div>
+                        <td>
+
+                            <span class="status-pill">
+                                <span class="status-dot status-dot--primary"></span>
+                                Version {{ version.version_number }}
+                            </span>
+
+                        </td>
+
+                        <td class="mono">
+
+                            {{ "%.2f"|format(version.file_size/1024) }} KB
+
+                        </td>
+
+                        <td class="mono">
+
+                            {{ version.uploaded_at.strftime("%d-%m-%Y %H:%M") }}
+
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+
+                        <td colspan="4"
+                            class="text-center text-muted">
+
+                            No Recent Uploads
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 {% endblock %}

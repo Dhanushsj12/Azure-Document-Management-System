@@ -4,153 +4,298 @@
 
 {% block content %}
 
-<!-- ========================= -->
-<!-- Page Header -->
-<!-- ========================= -->
+    <!-- ================= Header ================= -->
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header">
 
-    <h2>📁 Document Management</h2>
+        <div>
 
-    <a href="{{ url_for('document.upload') }}"
-       class="btn btn-primary">
+            <h2><i class="bi bi-folder2-open"></i> Document Management</h2>
 
-        ➕ Upload Document
+            <p class="page-subtitle">
 
-    </a>
+                Manage all uploaded documents stored in Azure Blob Storage
 
-</div>
+            </p>
 
+        </div>
 
-<!-- ========================= -->
-<!-- Search -->
-<!-- ========================= -->
+        <a href="{{ url_for('document.upload') }}"
+           class="btn btn-primary">
 
-<form method="GET" class="mb-4">
+            <i class="bi bi-cloud-upload-fill"></i> Upload Document
 
-    <div class="input-group">
-
-        <input
-            type="text"
-            name="search"
-            class="form-control"
-            placeholder="🔍 Search Documents..."
-            value="{{ search }}"
-        >
-
-        <button
-            class="btn btn-primary"
-            type="submit">
-
-            Search
-
-        </button>
+        </a>
 
     </div>
 
-</form>
 
+    <!-- ================= Search ================= -->
 
-<!-- ========================= -->
-<!-- Documents Table -->
-<!-- ========================= -->
+    <div class="card mb-3">
 
-<div class="card shadow">
+        <div class="card-body">
 
-    <div class="card-header bg-primary text-white">
+            <form method="GET">
 
-        <h5 class="mb-0">
+                <div class="input-group">
 
-            Uploaded Documents
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="search"
+                        placeholder="Search document..."
+                        value="{{ search }}"
+                    >
 
-        </h5>
+                    <button
+                        class="btn btn-primary">
+
+                        <i class="bi bi-search"></i> Search
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
 
     </div>
 
-    <div class="card-body">
 
-        <table class="table table-hover align-middle">
+    <!-- ================= Table ================= -->
 
-            <thead class="table-dark">
+    <div class="card">
+
+        <div class="card-header">
+
+            <i class="bi bi-files"></i> Uploaded Documents
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead>
+
+                    <tr>
+
+                        <th width="60"></th>
+
+                        <th>
+
+                            Document Name
+
+                        </th>
+
+                        <th>
+
+                            Type
+
+                        </th>
+
+                        <th>
+
+                            Storage
+
+                        </th>
+
+                        <th>
+
+                            Latest Version
+
+                        </th>
+
+                        <th>
+
+                            Owner
+
+                        </th>
+
+                        <th>
+
+                            Uploaded
+
+                        </th>
+
+                        <th class="text-center">
+
+                            Actions
+
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for doc in documents %}
+
+                {% set ext = doc.title.split('.')[-1].lower() %}
 
                 <tr>
 
-                    <th>ID</th>
-
-                    <th>Document Name</th>
-
-                    <th>Latest Version</th>
-
-                    <th>Created On</th>
-
-                    <th width="340">
-
-                        Actions
-
-                    </th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-            {% for doc in documents %}
-
-                <tr>
+                    <!-- Icon -->
 
                     <td>
 
-                        {{ doc.id }}
+                        <div class="file-icon">
+
+                        {% if ext == "pdf" %}
+
+                            <i class="bi bi-filetype-pdf"></i>
+
+                        {% elif ext in ["doc","docx"] %}
+
+                            <i class="bi bi-filetype-doc"></i>
+
+                        {% elif ext in ["xls","xlsx"] %}
+
+                            <i class="bi bi-filetype-xls"></i>
+
+                        {% elif ext in ["ppt","pptx"] %}
+
+                            <i class="bi bi-filetype-ppt"></i>
+
+                        {% elif ext in ["png","jpg","jpeg","gif"] %}
+
+                            <i class="bi bi-file-earmark-image"></i>
+
+                        {% elif ext in ["zip","rar"] %}
+
+                            <i class="bi bi-file-earmark-zip"></i>
+
+                        {% elif ext in ["mp4","avi"] %}
+
+                            <i class="bi bi-file-earmark-play"></i>
+
+                        {% elif ext in ["mp3","wav"] %}
+
+                            <i class="bi bi-file-earmark-music"></i>
+
+                        {% else %}
+
+                            <i class="bi bi-file-earmark"></i>
+
+                        {% endif %}
+
+                        </div>
 
                     </td>
 
+
+                    <!-- File Name -->
+
                     <td>
 
-                        📄 {{ doc.title }}
+                        <strong>
+
+                            {{ doc.title }}
+
+                        </strong>
 
                     </td>
 
+
+                    <!-- File Type -->
+
                     <td>
 
-                        <span class="badge bg-success">
-
-                            Version {{ doc.latest_version }}
-
+                        <span class="status-pill">
+                            <span class="status-dot status-dot--muted"></span>
+                            {{ ext.upper() }}
                         </span>
 
                     </td>
 
+
+                    <!-- Storage -->
+
                     <td>
 
-                        {{ doc.created_at.strftime("%d-%m-%Y %H:%M") }}
+                        <span class="status-pill">
+                            <span class="status-dot status-dot--teal"></span>
+                            Azure Blob
+                        </span>
 
                     </td>
 
+
+                    <!-- Version -->
+
                     <td>
 
-                        <a
-                            href="{{ url_for('document.download', id=doc.id) }}"
-                            class="btn btn-success btn-sm">
+                        <span class="status-pill">
+                            <span class="status-dot status-dot--primary"></span>
+                            V{{ doc.latest_version }}
+                        </span>
 
-                            ⬇ Download
+                    </td>
+
+
+                    <!-- Owner -->
+
+                    <td>
+
+                        {% if doc.owner %}
+
+                            {{ doc.owner.username }}
+
+                        {% else %}
+
+                            -
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- Upload Date -->
+
+                    <td class="mono">
+
+                        {{ doc.created_at.strftime("%d-%m-%Y") }}
+
+                        <br>
+
+                        <small class="text-muted">
+
+                            {{ doc.created_at.strftime("%H:%M") }}
+
+                        </small>
+
+                    </td>
+
+
+                    <!-- Actions -->
+
+                    <td class="text-center">
+
+                        <a href="{{ url_for('document.download', id=doc.id) }}"
+                           class="btn-icon"
+                           title="Download">
+
+                            <i class="bi bi-download"></i>
 
                         </a>
 
-                        <a
-                            href="{{ url_for('document.history', id=doc.id) }}"
-                            class="btn btn-info btn-sm">
+                        <a href="{{ url_for('document.history', id=doc.id) }}"
+                           class="btn-icon"
+                           title="Version history">
 
-                            📜 History
+                            <i class="bi bi-clock-history"></i>
 
                         </a>
 
-                        <a
-                            href="{{ url_for('document.delete', id=doc.id) }}"
-                            class="btn btn-danger btn-sm"
-                            onclick="return confirm('Delete this document?');">
+                        <a href="{{ url_for('document.delete', id=doc.id) }}"
+                           class="btn-icon btn-icon--danger"
+                           title="Delete"
+                           onclick="return confirm('Delete this document?');">
 
-                            🗑 Delete
+                            <i class="bi bi-trash"></i>
 
                         </a>
 
@@ -158,27 +303,31 @@
 
                 </tr>
 
-            {% else %}
+                {% else %}
 
                 <tr>
 
-                    <td colspan="5"
-                        class="text-center text-muted">
+                    <td colspan="8"
+                        class="text-center text-muted py-5">
 
-                        No Documents Found
+                        <h5>
+
+                            No Documents Found
+
+                        </h5>
 
                     </td>
 
                 </tr>
 
-            {% endfor %}
+                {% endfor %}
 
-            </tbody>
+                </tbody>
 
-        </table>
+            </table>
+
+        </div>
 
     </div>
-
-</div>
 
 {% endblock %}
