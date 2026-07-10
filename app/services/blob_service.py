@@ -34,7 +34,6 @@ class BlobService:
             blob_name
         )
 
-        # Always rewind stream before upload
         file.stream.seek(0)
 
         blob_client.upload_blob(
@@ -91,19 +90,27 @@ class BlobService:
         version_id
     ):
 
-        blob_client = BlobService.container_client.get_blob_client(
+        # Create a client for the OLD version
+        old_blob_client = BlobService.container_client.get_blob_client(
             blob_name
         )
 
-        data = blob_client.download_blob(
+        # Download the requested version
+        data = old_blob_client.download_blob(
             version_id=version_id
         ).readall()
 
-        blob_client.upload_blob(
-            data,
+        # Create a NEW client for the current blob
+        latest_blob_client = BlobService.container_client.get_blob_client(
+            blob_name
+        )
+
+        # Upload the old data as the newest version
+        latest_blob_client.upload_blob(
+            data=data,
             overwrite=True
         )
 
-        properties = blob_client.get_blob_properties()
+        properties = latest_blob_client.get_blob_properties()
 
         return properties.version_id
