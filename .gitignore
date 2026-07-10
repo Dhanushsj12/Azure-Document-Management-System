@@ -23,3 +23,10 @@ logs/
 
 # Windows
 Thumbs.db
+
+# Python cache
+.pytest_cache/
+
+# Uploads (optional - local uploads only)
+app/static/uploads/*
+!app/static/uploads/.gitkeep
