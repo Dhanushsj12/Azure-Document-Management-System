@@ -68,6 +68,7 @@ def documents():
 # -------------------------------------------------
 # Upload
 # -------------------------------------------------
+print(">>>>>>>> VersionService.upload() IS RUNNING <<<<<<<<")
 @document_bp.route("/upload", methods=["GET", "POST"])
 @login_required
 def upload():

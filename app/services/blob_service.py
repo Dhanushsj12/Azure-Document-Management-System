@@ -34,7 +34,7 @@ class BlobService:
             blob_name
         )
 
-        # Always rewind the stream
+        # Always rewind stream before upload
         file.stream.seek(0)
 
         blob_client.upload_blob(
@@ -47,7 +47,8 @@ class BlobService:
 
         return {
             "url": blob_client.url,
-            "version_id": properties.version_id
+            "version_id": properties.version_id,
+            "size": properties.size
         }
 
     # ---------------------------------------------------

@@ -12,6 +12,8 @@ class VersionService:
     @staticmethod
     def upload(file, user_id):
 
+        print("\n========== VERSION SERVICE START ==========")
+
         # Check whether document already exists
         document = Document.query.filter_by(
             title=file.filename
@@ -25,13 +27,9 @@ class VersionService:
         else:
 
             document = Document(
-
                 title=file.filename,
-
                 owner_id=user_id,
-
                 latest_version=1
-
             )
 
             db.session.add(document)
@@ -39,9 +37,18 @@ class VersionService:
 
             version_number = 1
 
-        # Upload using ORIGINAL filename
-        # Azure automatically creates previous versions
+        # ----------------------------------------
+        # Calculate local file size
+        # ----------------------------------------
+        file.stream.seek(0, os.SEEK_END)
+        local_size = file.stream.tell()
+        file.stream.seek(0)
 
+        print(f"Local File Size : {local_size}")
+
+        # ----------------------------------------
+        # Upload to Azure Blob Storage
+        # ----------------------------------------
         blob_name = document.title
 
         blob = BlobService.upload_file(
@@ -49,8 +56,24 @@ class VersionService:
             blob_name
         )
 
-        print("Azure Upload Result:", blob)
+        print(f"Azure Upload Result : {blob}")
 
+        # ----------------------------------------
+        # Get Azure Blob Size
+        # ----------------------------------------
+        blob_client = BlobService.container_client.get_blob_client(
+            blob_name
+        )
+
+        properties = blob_client.get_blob_properties()
+
+        azure_size = properties.size
+
+        print(f"Azure Blob Size : {azure_size}")
+
+        # ----------------------------------------
+        # Save Version
+        # ----------------------------------------
         version = Version(
 
             document_id=document.id,
@@ -59,7 +82,7 @@ class VersionService:
 
             uploaded_by=user_id,
 
-            file_size=file.content_length if file.content_length else 0,
+            file_size=azure_size,
 
             file_path=blob["url"],
 
@@ -68,8 +91,10 @@ class VersionService:
         )
 
         db.session.add(version)
-
         db.session.commit()
+
+        print(f"Saved to Database : {version.file_size}")
+        print("=========== VERSION SERVICE END ===========\n")
 
         AuditService.log(
 
@@ -93,21 +118,14 @@ class VersionService:
         blob_name = version.document.title
 
         BlobService.restore_version(
-
             blob_name,
-
             version.azure_version_id
-
         )
 
         AuditService.log(
-
             user_id=version.uploaded_by,
-
             action="Restore",
-
-            document_name=version.document.title
-
+            document_name=document.title
         )
 
         return True
