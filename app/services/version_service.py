@@ -111,21 +111,68 @@ class VersionService:
     @staticmethod
     def restore(version_id):
 
-        version = Version.query.get_or_404(
-            version_id
-        )
+        # ----------------------------------------
+        # Get selected version
+        # ----------------------------------------
+        version = Version.query.get_or_404(version_id)
 
-        blob_name = version.document.title
+        # ----------------------------------------
+        # Get document object
+        # ----------------------------------------
+        document = version.document
 
-        BlobService.restore_version(
+        # ----------------------------------------
+        # Blob name
+        # ----------------------------------------
+        blob_name = document.title
+
+        # ----------------------------------------
+        # Restore Azure Blob Version
+        # ----------------------------------------
+        new_version_id = BlobService.restore_version(
             blob_name,
             version.azure_version_id
         )
 
+        # ----------------------------------------
+        # Update latest version number
+        # ----------------------------------------
+        document.latest_version += 1
+
+        # ----------------------------------------
+        # Create new database version entry
+        # ----------------------------------------
+        restored_version = Version(
+
+            document_id=document.id,
+
+            version_number=document.latest_version,
+
+            uploaded_by=version.uploaded_by,
+
+            file_size=version.file_size,
+
+            file_path=version.file_path,
+
+            azure_version_id=new_version_id
+
+        )
+
+        db.session.add(restored_version)
+
+        db.session.commit()
+
+        # ----------------------------------------
+        # Audit Log
+        # ----------------------------------------
         AuditService.log(
+
             user_id=version.uploaded_by,
+
             action="Restore",
+
             document_name=document.title
+
         )
 
         return True
