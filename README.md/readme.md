@@ -179,72 +179,71 @@ Tracks
 
 ---
 
-#  Screenshots
+# 🖼️ Screenshots
 
 ## Login
 
-![Login](screenshots/login.png)
+![Login](../screenshots/login.png)
 
 ---
 
 ## Dashboard
 
-![Dashboard](screenshots/dashboard.png)
+![Dashboard](../screenshots/dashboard.png)
 
 ---
 
 ## Documents
 
-![Documents](screenshots/documents.png)
+![Documents](../screenshots/document.png)
 
 ---
 
 ## Upload Document
 
-![Upload](screenshots/upload.png)
+![Upload](../screenshots/upload.png)
 
 ---
 
 ## Version History
 
-![Version History](screenshots/version-history.png)
+![Version History](../screenshots/versionhistory.png)
 
 ---
 
 ## Audit Logs
 
-![Audit Logs](screenshots/audit-logs.png)
+![Audit Logs](../screenshots/auditlogs.png)
 
 ---
 
 ## Azure Blob Storage
 
-![Azure Blob Storage](screenshots/azure-blob-storage.png)
+![Azure Blob Storage](../screenshots/azureblobstorage.png)
 
 ---
 
 ## Azure SQL Database
 
-![Azure SQL Database](screenshots/azure-sql-database.png)
+![Azure SQL Database](../screenshots/azuresqldatabase.png)
 
 ---
 
 ## Azure Dashboard
 
-![Azure Dashboard](screenshots/azure-dashboard.png)
+![Azure Dashboard](../screenshots/azuredashboard.png)
 
 ---
 
 ## Deployment Center
 
-![Deployment Center](screenshots/deployment-center.png)
+![Deployment Center](../screenshots/deploymentdashboard.png)
 
 ---
 
 ## SQL Metrics
 
-![SQL Metrics](screenshots/sql-metrics.png)
-
+![SQL Metrics](../screenshots/sqlmetrics.png)
 ---
 
 # ⚙ Installation
