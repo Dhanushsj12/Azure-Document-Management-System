@@ -179,7 +179,71 @@ Tracks
 
 ---
 
-#  Screenshots
+# 🖼️ Screenshots
+
+## Login
+
+![Login](https://raw.githubusercontent.com/Dhanushsj12/Azure-Document-Management-System/main/screenshots/login.png)
+
+---
+
+## Dashboard
+
+![Dashboard](https://raw.githubusercontent.com/Dhanushsj12/Azure-Document-Management-System/main/screenshots/dashboard.png)
+
+---
+
+## Documents
+
+![Documents](https://raw.githubusercontent.com/Dhanushsj12/Azure-Document-Management-System/main/screenshots/document.png)
+
+---
+
+## Upload Document
+
+![Upload](https://raw.githubusercontent.com/Dhanushsj12/Azure-Document-Management-System/main/screenshots/upload.png)
+
+---
+
+## Version History
+
+![Version History](https://raw.githubusercontent.com/Dhanushsj12/Azure-Document-Management-System/main/screenshots/versionhistory.png)
+
+---
+
+## Audit Logs
+
+![Audit Logs](https://raw.githubusercontent.com/Dhanushsj12/Azure-Document-Management-System/main/screenshots/auditlogs.png)
+
+---
+
+## Azure Blob Storage
+
+![Azure Blob Storage](https://raw.githubusercontent.com/Dhanushsj12/Azure-Document-Management-System/main/screenshots/azureblobstorage.png)
+
+---
+
+## Azure SQL Database
+
+![Azure SQL Database](https://raw.githubusercontent.com/Dhanushsj12/Azure-Document-Management-System/main/screenshots/azuresqldatabase.png)
+
+---
+
+## Azure Dashboard
+
+![Azure Dashboard](https://raw.githubusercontent.com/Dhanushsj12/Azure-Document-Management-System/main/screenshots/azuredashboard.png)
+
+---
+
+## Deployment Center
+
+![Deployment Center](https://raw.githubusercontent.com/Dhanushsj12/Azure-Document-Management-System/main/screenshots/deploymentdashboard.png)
+
+---
+
+## SQL Metrics
+
+![SQL Metrics](https://raw.githubusercontent.com/Dhanushsj12/Azure-Document-Management-System/main/screenshots/sqlmetrics.png)
 
 ## Login
 
