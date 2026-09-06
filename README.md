@@ -1,32 +1,4 @@
-Yes. The problem is that your current README contains **two screenshot sections**, the second one uses filenames that **do not exist**, and the first section uses unnecessary raw GitHub URLs. Also, your README has some corrupted Unicode characters such as `Γöé` and `≡ƒû╝`.
 
-Since `README.md` is now correctly at the **repository root** and `screenshots` is a sibling folder, the safest image syntax is simply:
-
-```markdown
-![Login](screenshots/login.png)
-```
-
-Your actual screenshot filenames are:
-
-```text
-auditlogs.png
-azureblobstorage.png
-azuredashboard.png
-azuredatabase.png
-azuresqldatabase.png
-dashboard.png
-dashboard1.png
-deploymentdashboard.png
-document.png
-document1.png
-grid.png
-login.png
-sqlmetrics.png
-upload.png
-versionhistory.png
-```
-
-## Replace your ENTIRE `README.md` with this
 
 ````markdown
 # Azure Cloud-Based Document Management System
